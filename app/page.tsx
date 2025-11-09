@@ -1,65 +1,48 @@
-import Image from "next/image";
+// app/page.tsx
+import Gallery from "@/components/Gallery";
+import { format } from "date-fns";
+import { Metadata } from "next/dist/types";
+
+export const metadata: Metadata = {
+  title: "Spandan & Disha | Memories",
+  description:
+    "A timeless private gallery celebrating Spandan and Disha's journey together — filled with love, laughter, and memories.",
+  openGraph: {
+    title: "Spandan & Disha | Memory Vault",
+    description: "A private gallery of our most cherished memories together.",
+    url: "https://spandandisha.com",
+    type: "website",
+    images: ["/og-image.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Spandan & Disha | Memory Vault",
+    description: "A private gallery celebrating love and memories.",
+    images: ["/og-image.jpg"],
+  },
+  authors: [{ name: "Spandan" }],
+};
 
 export default function Home() {
+  const anniversary = new Date("2023-11-09");
+  const today = new Date();
+  const years = 2;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="max-w-7xl mx-auto p-4">
+      <div className="text-center mb-8 p-6 bg-linear-to-r from-purple-300 to-violet-400 rounded-2xl shadow-lg">
+        <h1 className="text-4xl font-bold text-pink-800 mb-2">
+          Happy {years === 2 ? "2nd" : `${years}th`} Anniversary, Disha!
+        </h1>
+        <p className="text-lg text-black">
+          {format(anniversary, "MMMM d, yyyy")} → Today
+        </p>
+        <p className="mt-2 text-blue-900 italic font-bold">
+          Every photo is a memory. Every memory is us.
+        </p>
+      </div>
+
+      <Gallery folder="" />
+    </main>
   );
 }
