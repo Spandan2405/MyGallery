@@ -42,7 +42,9 @@ export default function RootLayout({
                 href="/"
                 className="text-2xl font-bold tracking-tight flex items-center gap-2"
               >
-                <span className="text-3xl">Memories❤️</span>
+                <span className="text-3xl flex items-center justify-center gap-1">
+                  Memories <Heart size={30} color="red" fill="red" />{" "}
+                </span>
               </Link>
 
               {/* Desktop Nav */}

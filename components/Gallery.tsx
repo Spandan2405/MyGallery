@@ -1,28 +1,20 @@
 // components/Gallery.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Masonry from "react-masonry-css";
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import "react-photo-view/dist/react-photo-view.css";
 import axios from "axios";
 import GalleryItem from "./GalleryItem";
 import { Loader2 } from "lucide-react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css";
 
-// === Cloudinary Resource Type ===
 interface CloudinaryResource {
   public_id: string;
   secure_url: string;
   resource_type: "image" | "video";
-  format: string;
-  width?: number;
-  height?: number;
-  bytes?: number;
-  created_at?: string;
-  tags?: string[];
 }
 
-// === Props Type ===
 interface GalleryProps {
   folder?: string;
   isFavorites?: boolean;
@@ -32,7 +24,17 @@ const breakpointColumns = {
   default: 4,
   1100: 3,
   500: 2,
-} as const;
+};
+
+// Fisher-Yates Shuffle Function
+const shuffleArray = (array: CloudinaryResource[]): CloudinaryResource[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
 
 export default function Gallery({
   folder = "",
@@ -40,106 +42,98 @@ export default function Gallery({
 }: GalleryProps) {
   const [media, setMedia] = useState<CloudinaryResource[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [folders, setFolders] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal state
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // don't pass "undefined" as folder
       const mediaPromise = isFavorites
-        ? axios.get<CloudinaryResource[]>("/api/favorites")
-        : folder && folder !== "undefined"
-        ? axios.get<CloudinaryResource[]>(
-            `/api/media?folder=${encodeURIComponent(folder)}`
-          )
-        : axios.get<CloudinaryResource[]>(`/api/media`); // fetch all when folder is empty
+        ? axios.get("/api/favorites")
+        : folder
+        ? axios.get(`/api/media?folder=${encodeURIComponent(folder)}`)
+        : axios.get("/api/media");
 
-      // Fetch favorites & folders in parallel
-      const [mediaRes, favRes, folderRes] = await Promise.all([
+      const [mediaRes, favRes] = await Promise.all([
         mediaPromise,
-        axios.get<CloudinaryResource[]>("/api/favorites"),
-        axios.get<string[]>("/api/folders"),
+        axios.get("/api/favorites"),
       ]);
 
-      setMedia(mediaRes.data);
-      setFavorites(new Set(favRes.data.map((m) => m.public_id)));
-      setFolders(folderRes.data);
+      setMedia(shuffleArray(mediaRes.data));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setFavorites(new Set(favRes.data.map((m: any) => m.public_id)));
     } catch (err) {
-      console.error("Failed to fetch gallery data:", err);
+      console.error("Gallery fetch failed", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!folder && !isFavorites) {
-      console.warn("⚠️ No folder provided — skipping fetchData()");
-    }
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folder, isFavorites]);
 
+  // Keyboard navigation
+  const handleKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (activeIndex === null) return;
+      if (e.key === "Escape") setActiveIndex(null);
+      if (e.key === "ArrowRight")
+        setActiveIndex((i) => (i! + 1) % media.length);
+      if (e.key === "ArrowLeft")
+        setActiveIndex((i) => (i! - 1 + media.length) % media.length);
+    },
+    [activeIndex, media.length]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [handleKey]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 size={40} className="animate-spin text-pink-600" />
+        <Loader2 className="animate-spin text-pink-600" size={40} />
       </div>
     );
   }
 
-  if (media.length === 0) {
+  if (!media.length) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <p className="text-lg">No photos here yet</p>
-        <p className="text-sm mt-1">Upload some memories!</p>
+      <div className="text-center py-24 text-gray-500">
+        <p className="text-xl font-medium">No media found</p>
       </div>
     );
   }
 
   return (
-    <PhotoProvider
-      maskOpacity={0.85}
-      toolbarRender={({ index, images, onIndexChange }) => (
-        <div className="flex items-center justify-center gap-8 p-6 bg-black/90 text-white">
-          <button
-            onClick={() => onIndexChange(index - 1)}
-            disabled={index === 0}
-            className="px-4 py-2 bg-white/10 rounded-lg disabled:opacity-50 hover:bg-white/20 transition"
-          >
-            Previous
-          </button>
-          <span className="text-sm font-medium min-w-20 text-center">
-            {index + 1} / {images.length}
-          </span>
-          <button
-            onClick={() => onIndexChange(index + 1)}
-            disabled={index === images.length - 1}
-            className="px-4 py-2 bg-white/10 rounded-lg disabled:opacity-50 hover:bg-white/20 transition"
-          >
-            Next
-          </button>
-        </div>
-      )}
-    >
-      <Masonry
-        breakpointCols={breakpointColumns}
-        className="flex w-auto -ml-4"
-        columnClassName="pl-4"
-      >
-        {media.map((item) => (
-          <PhotoView key={item.public_id} src={item.secure_url}>
-            <div className="mb-4 cursor-zoom-in">
-              <GalleryItem
-                item={item}
-                isFav={favorites.has(item.public_id)}
-                folders={folders}
-                onUpdate={fetchData}
-              />
+    <>
+      {/* ===== Masonry Grid ===== */}
+      <PhotoProvider maskOpacity={0.9} bannerVisible={false}>
+        <Masonry
+          breakpointCols={breakpointColumns}
+          className="flex w-auto -ml-4"
+          columnClassName="pl-4 bg-clip-padding"
+        >
+          {media.map((item) => (
+            <div key={item.public_id} className="mb-4">
+              <PhotoView src={item.secure_url}>
+                <div>
+                  <GalleryItem
+                    item={item}
+                    isFav={favorites.has(item.public_id)}
+                    onUpdate={fetchData}
+                  />
+                </div>
+              </PhotoView>
             </div>
-          </PhotoView>
-        ))}
-      </Masonry>
-    </PhotoProvider>
+          ))}
+        </Masonry>
+      </PhotoProvider>
+    </>
   );
 }
