@@ -2,7 +2,6 @@
 // app/page.tsx
 import Gallery from "@/components/Gallery";
 import { format } from "date-fns";
-import { Heart } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,9 +14,12 @@ export const metadata: Metadata = {
 const QUOTES = [
   "Every photo is a memory. Every memory is us.",
   "In every frame, I find a reason to love you more.",
-  "Time passes, love stays — and we capture it forever.",
-  "Some moments are too special to fade. We kept them.",
+  "Some memories never stop feeling new.",
+  "Some moments are too special to fade.",
   "Still falling for you, one memory at a time.",
+  "Our love story, captured one photo at a time.",
+  "Together, we've created a gallery of unforgettable moments.",
+  "Every picture tells a story, and ours is my favorite.",
 ];
 
 const NAMES = [
@@ -27,6 +29,7 @@ const NAMES = [
   "My Panda",
   "My Baby",
   "My World",
+  "Meri Rasmalai",
 ];
 
 export default function Home() {
@@ -42,8 +45,7 @@ export default function Home() {
       {/* ===== Header Card ===== */}
       <div className="text-center mb-10 px-4 py-8 sm:p-10 bg-linear-to-r from-purple-300 to-violet-400 rounded-3xl shadow-xl">
         <h1 className="flex flex-wrap items-center justify-center gap-2 text-3xl md:text-4xl font-bold text-pink-900 mb-3 leading-tight">
-          Happy {years === 2 ? "2nd" : `${years}th`} Anniversary, {names}!
-          <Heart size={28} className="text-pink-700" fill="currentColor" />
+          Happy {years === 2 ? "2nd" : `${years}th`} Anniversary, {names} !💞
         </h1>
 
         <p className="text-md text-black/80">

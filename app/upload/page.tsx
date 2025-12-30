@@ -58,12 +58,16 @@ export default function UploadPage() {
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <Toaster position="top-center" />
-      <h1 className="text-2xl font-bold mb-6 text-center sm:text-left">
+      <h1
+        className="inline-block text-2xl md:text-4xl font-bold 
+               bg-linear-to-r from-pink-600 to-purple-600
+               bg-clip-text text-transparent mb-6"
+      >
         Upload Photos & Videos
       </h1>
 
       <div
-        className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+        className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer  hover:border-purple-500 transition-colors"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
@@ -130,7 +134,7 @@ export default function UploadPage() {
           <button
             onClick={uploadFiles}
             disabled={uploading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-medium disabled:opacity-50"
+            className="w-full bg-linear-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-medium disabled:opacity-50"
           >
             {uploading ? "Uploading..." : `Upload ${files.length} File(s)`}
           </button>

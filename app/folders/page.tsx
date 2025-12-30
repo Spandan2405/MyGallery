@@ -48,30 +48,39 @@ export default function AlbumsPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Albums</h1>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Our Albums 💕
+          </h1>
+          <p className="text-pink-600 mt-2 text-sm md:text-base">
+            Create timeless collections of us
+          </p>
+        </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <input
             type="text"
-            placeholder="New album name"
+            placeholder="New album name (e.g., 'Our First Trip')"
             value={newFolder}
             onChange={(e) => setNewFolder(e.target.value)}
-            className="border rounded-lg px-3 py-2"
+            className="flex-1 sm:flex-none border-2 border-pink-200 rounded-xl px-4 py-3 focus:border-pink-400 focus:outline-none transition"
             onKeyPress={(e) => e.key === "Enter" && createFolder()}
           />
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={createFolder}
-            className="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700"
+            className="bg-linear-to-r from-pink-500 to-purple-600 text-white p-4 rounded-xl shadow-lg disabled:opacity-50 hover:shadow-xl transition disabled:cursor-not-allowed"
           >
             <Plus size={20} />
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {folders.length === 0
           ? // Skeleton
-            Array(6)
+            Array(8)
               .fill(0)
               .map((_, i) => (
                 <motion.div
@@ -104,7 +113,7 @@ export default function AlbumsPage() {
                         autoFocus
                       />
                     ) : (
-                      <h3 className="font-medium truncate text-black">
+                      <h3 className="font-semibold truncate text-black">
                         {folder}
                       </h3>
                     )}
